@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transcribe", "Transcribe\Transcribe.csproj", "{CBA36335-187F-4270-9F71-BFE61F7A7C36}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Transcriber Install Wizard", "Transcriber Install Wizard\Transcriber Install Wizard.vdproj", "{D59BAAF1-0657-4791-9F0D-DD96CF32C1F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBA36335-187F-4270-9F71-BFE61F7A7C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA36335-187F-4270-9F71-BFE61F7A7C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA36335-187F-4270-9F71-BFE61F7A7C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA36335-187F-4270-9F71-BFE61F7A7C36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D59BAAF1-0657-4791-9F0D-DD96CF32C1F7}.Debug|Any CPU.ActiveCfg = Debug
+		{D59BAAF1-0657-4791-9F0D-DD96CF32C1F7}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD7D54B0-5DDA-4DEA-B70F-5BE9481145AC}
+	EndGlobalSection
+EndGlobal
