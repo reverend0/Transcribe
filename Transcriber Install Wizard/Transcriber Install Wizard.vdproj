@@ -84,21 +84,6 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
-                    {
-                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
-                    }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.5.0.x64"
-                    {
-                    "Name" = "8:.NET Runtime 5.0.8 (x64)"
-                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.5.0.x64"
-                    }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.5.0.x86"
-                    {
-                    "Name" = "8:.NET Runtime 5.0.8 (x86)"
-                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.5.0.x86"
-                    }
                     "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.5.0.x64"
                     {
                     "Name" = "8:.NET Desktop Runtime 5.0.8 (x64)"
@@ -157,6 +142,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_918680C61968487AA9B54BAF5F8DE5A2"
+                    {
+                    "Name" = "8:Transcriber"
+                    "AlwaysCreate" = "11:TRUE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_B8415AF1BF4E42EB8D8315C87B9939B4"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_E30F421CC8FE469185247EDB64A3F24D"
@@ -174,7 +170,7 @@
             {
             "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
             "Name" = "8:#1925"
-            "AlwaysCreate" = "11:FALSE"
+            "AlwaysCreate" = "11:TRUE"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Property" = "8:TARGETDIR"
@@ -198,8 +194,8 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Transcriber"
-        "ProductCode" = "8:{B44E4581-943E-4D2E-A5C7-0AF4642C0CBE}"
-        "PackageCode" = "8:{24BEBE8E-2CCD-4805-A0B1-31E816526413}"
+        "ProductCode" = "8:{497DDA56-FA14-430C-B8B0-B74DED888DCA}"
+        "PackageCode" = "8:{6FDF2B71-72A3-4371-89E7-E4DF2F6AA76E}"
         "UpgradeCode" = "8:{B96796B8-D7AE-40C0-8F64-A35323B020F2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -319,6 +315,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_E3DCAE9B51254FE7BFA866E941DB5BC3"
+            {
+            "Name" = "8:Transcriber"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_0C4504A1CD4644E380438D1EA0F1ECCC"
+            "Folder" = "8:_918680C61968487AA9B54BAF5F8DE5A2"
+            "WorkingFolder" = "8:_FA96A62613954ECCB1F7C7520F555516"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {

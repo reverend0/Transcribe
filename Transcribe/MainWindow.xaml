@@ -23,6 +23,7 @@
             <MenuItem Header="_File">
                 <MenuItem x:Name="DeviceMenuList" Header="_Device" />
                 <MenuItem Header="_Font" Click="MenuItemFont_Click"/>
+                <MenuItem Header="_Background Color" Click="MenuItemColor_Click"/>
                 <MenuItem Header="_Set Keys" Click="MenuItemSetKey_Click" />
                 <Separator />
                 <MenuItem Header="_Exit" />
@@ -66,7 +67,7 @@
             <TextBox x:Name="RTAudioTranscriptionDisplay" Grid.Row="2" Grid.Column="0" TextWrapping="Wrap" Background="Lime" FontWeight="Bold" FontFamily="Arial Black"/>
         </Grid>
 
-        <GridSplitter Grid.Row="2" Grid.Column="1" Grid.RowSpan="3" Width="3" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Width="3" HorizontalAlignment="Stretch"/>
         <TextBox x:Name="TranscriptionDisplay" Grid.Row="2" Grid.Column="2" TextWrapping="Wrap" Background="Lime" FontFamily="Arial Black" FontWeight="Bold"/>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
