@@ -118,5 +118,15 @@ namespace Transcribe
             }
             return null;
         }
+
+        public string getValue(string key, string defaultValue)
+        {
+            string result = getValue(key);
+            if (result == null)
+            {
+                return defaultValue;
+            }
+            return result;
+        }
     }
 }

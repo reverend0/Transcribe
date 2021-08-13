@@ -61,7 +61,8 @@ namespace Transcribe
                 }
             }
 
-            service = new AzureService(azureKey, azureLocation, display);
+            bool filterProfanity = manager.getValue("profanity", "true").Equals("true") ? true : false;
+            service = new AzureService(azureKey, azureLocation, display, filterProfanity);
         }
 
         private void InitializeDeviceListMenu()
@@ -218,8 +219,12 @@ namespace Transcribe
             {
                 string azureKey = keyManagerDialog.Key;
                 string azureLocation = keyManagerDialog.Location;
+                string profanityFilterStr = keyManagerDialog.filterProfanity;
                 manager.setAzureKeyLocation(azureKey, azureLocation);
-                service = new AzureService(azureKey, azureLocation, display);
+                manager.setValue("profanity", profanityFilterStr);
+                bool filterProfanity = manager.getValue("profanity", "true").Equals("true") ? true : false;
+                service = new AzureService(azureKey, azureLocation, display, filterProfanity);
+
             }
         }
 

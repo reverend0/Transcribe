@@ -17,9 +17,17 @@ namespace Transcribe
         private PushAudioInputStream audioInputStream;
         private WasapiLoopbackCapture loopbackCapture;
 
-        public AzureService(string serviceKey, string endpoint, DisplayHelper displayHelper)
+        public AzureService(string serviceKey, string endpoint, DisplayHelper displayHelper, bool filterProfanity)
         {
             speechConfig = SpeechConfig.FromSubscription(serviceKey, endpoint);
+            if (filterProfanity)
+            {
+                speechConfig.SetProfanity(ProfanityOption.Masked);
+            }
+            else
+            {
+                speechConfig.SetProfanity(ProfanityOption.Raw);
+            }
             display = displayHelper;
         }
 

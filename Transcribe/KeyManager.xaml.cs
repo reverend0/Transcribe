@@ -21,6 +21,7 @@ namespace Transcribe
     {
         public string Key;
         public string Location;
+        public string filterProfanity;
         private RegistryManager manager = new RegistryManager();
 
         public KeyManager()
@@ -28,14 +29,17 @@ namespace Transcribe
             InitializeComponent();
             string azureKey = manager.getAzureKey();
             string azureLocation = manager.getAzureLocation();
+            string filterProfanityReg = manager.getValue("profanity", "true");
             KeyBox.Text = azureKey;
             LocationBox.Text = azureLocation;
+            filterProfanityCheck.IsChecked = filterProfanityReg == "true";
         }
 
         private void acceptButton_Click(object sender, RoutedEventArgs e)
         {
             Key = KeyBox.Text;
             Location = LocationBox.Text;
+            filterProfanity = (bool)filterProfanityCheck.IsChecked ? "true" : "false";
             this.DialogResult = true;
         }
     }

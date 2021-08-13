@@ -16,6 +16,7 @@
             <TextBox x:Name="KeyBox"/>
             <TextBlock Text="Location"/>
             <TextBox x:Name="LocationBox"/>
+            <CheckBox x:Name="filterProfanityCheck" Content="Filter Profanity"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
             <Button IsDefault="True" Width="50" Click="acceptButton_Click">OK</Button>
