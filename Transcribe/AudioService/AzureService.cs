@@ -38,7 +38,6 @@ namespace Transcribe
                 if (e.Result.Reason == ResultReason.RecognizedSpeech)
                 {
                     display.PrependTranscription(e.Result.Text);
-                    display.SetRealtimeMicrophoneTranscription("");
                 }
                 else if (e.Result.Reason == ResultReason.NoMatch)
                 {
@@ -94,7 +93,6 @@ namespace Transcribe
                 if (e.Result.Reason == ResultReason.RecognizedSpeech)
                 {
                     display.PrependTranscription(e.Result.Text);
-                    display.SetRealtimeAudioTranscription("");
                 }
                 else if (e.Result.Reason == ResultReason.NoMatch)
                 {
