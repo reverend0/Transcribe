@@ -22,9 +22,12 @@
         <Menu Grid.Row="0" Grid.ColumnSpan="3">
             <MenuItem Header="_File">
                 <MenuItem x:Name="DeviceMenuList" Header="_Device" />
+                <MenuItem x:Name="ServiceMenuList" Header="_Transcription Service">
+                    <MenuItem Header="_Azure" IsCheckable="True" IsChecked="True" Click="ServiceMenuItem_Click"/>
+                </MenuItem>
                 <MenuItem Header="_Font" Click="MenuItemFont_Click"/>
                 <MenuItem Header="_Background Color" Click="MenuItemColor_Click"/>
-                <MenuItem Header="_Set Keys" Click="MenuItemSetKey_Click" />
+                <MenuItem Header="_Set Azure Keys" Click="MenuItemSetKey_Click" />
                 <Separator />
                 <MenuItem Header="_Exit" />
             </MenuItem>

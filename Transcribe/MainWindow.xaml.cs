@@ -152,6 +152,23 @@ namespace Transcribe
             }
         }
 
+        private void ServiceMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem selected = (MenuItem)e.Source;
+            ItemCollection collection = ServiceMenuList.Items;
+            foreach (MenuItem item in collection)
+            {
+                if (item.Header == selected.Header)
+                {
+                    item.IsChecked = true;
+                }
+                else
+                {
+                    item.IsChecked = false;
+                }
+            }
+        }
+
         private async Task TranscribeLoop()
         {
             while (stillWorking)
@@ -247,5 +264,6 @@ namespace Transcribe
                 InitializeFontsAndBackground();
             }
         }
+
     }
 }
