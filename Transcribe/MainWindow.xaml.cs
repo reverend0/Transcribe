@@ -265,5 +265,12 @@ namespace Transcribe
             }
         }
 
+        private void ClearDisplay_Click(object sender, RoutedEventArgs e)
+        {
+            display.Clear();
+            RTMicTranscriptionDisplay.Text = display.GetRealtimeMic();
+            RTAudioTranscriptionDisplay.Text = display.GetRealtimeAudio();
+            TranscriptionDisplay.Text = display.GetTranscription();
+        }
     }
 }

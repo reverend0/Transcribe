@@ -33,5 +33,10 @@
         {
             this.value = data;
         }
+
+        public void Clear()
+        {
+            this.value = "";
+        }
     }
 }

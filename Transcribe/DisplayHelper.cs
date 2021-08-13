@@ -55,5 +55,12 @@
         {
             return error.Get();
         }
+
+        public void Clear()
+        {
+            rtAudioTranscriber.Clear();
+            rtMicTranscriber.Clear();
+            transcriber.Clear();
+        }
     }
 }
