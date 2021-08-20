@@ -70,7 +70,7 @@ namespace Transcribe
                 reg.Close();
                 return result;
             }
-            return System.Drawing.Color.FromArgb(0, 0, 255, 0);
+            return System.Drawing.Color.AntiqueWhite;
         }
 
         public System.Windows.Media.Color getColorMedia(string prefix)
@@ -97,7 +97,7 @@ namespace Transcribe
                 reg.Close();
                 return result;
             }
-            return System.Windows.Media.Color.FromArgb(0, 0, 255, 0);
+            return System.Windows.Media.Brushes.White.Color;
         }
 
         public void setValue(string key, string value)

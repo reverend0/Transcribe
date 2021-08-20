@@ -86,16 +86,21 @@ namespace Transcribe
 
         private void InitializeFontsAndBackground()
         {
+            // Defaults as white if there is not registry entry
             SolidColorBrush bgBrush = new SolidColorBrush(manager.getColorMedia("bg"));
             TranscriptionDisplay.Background = bgBrush;
             RTAudioTranscriptionDisplay.Background = bgBrush;
             RTMicTranscriptionDisplay.Background = bgBrush;
+            TranscriptionDisplay.BorderBrush = bgBrush;
+            RTAudioTranscriptionDisplay.BorderBrush = bgBrush;
+            RTMicTranscriptionDisplay.BorderBrush = bgBrush;
 
+            // Defaults
             FontFamily family = new FontFamily("Arial");
             float size = 10;
             FontStyle style = FontStyles.Normal;
             FontWeight weight = FontWeights.Normal;
-            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+            SolidColorBrush brush = Brushes.Black;
             if (manager.getValue("fontFamily") != null)
             {
                 family = new FontFamily(manager.getValue("fontFamily"));
@@ -172,43 +177,64 @@ namespace Transcribe
 
         private async Task TranscribeLoop()
         {
+            long loopCounter = 0;
+            string oldRTmic = "", oldRTaudio = "", oldTranscription = "";
             while (stillWorking)
             {
                 RTMicTranscriptionDisplay.Text = display.GetRealtimeMic();
                 RTAudioTranscriptionDisplay.Text = display.GetRealtimeAudio();
                 TranscriptionDisplay.Text = display.GetTranscription();
+                if (RTMicTranscriptionDisplay.Text.Equals(oldRTmic)
+                    && RTAudioTranscriptionDisplay.Text.Equals(oldRTaudio)
+                    && TranscriptionDisplay.Text.Equals(oldTranscription))
+                {
+                    loopCounter++;
+                    // If there is not audio for 30 minutes and no audio is on, stop listening.
+                    if (loopCounter >= (10 * 60 * 30)) StopListening();
+                }
+                else loopCounter = 0;
+
+                oldRTmic = RTMicTranscriptionDisplay.Text;
+                oldRTaudio = RTAudioTranscriptionDisplay.Text;
+                oldTranscription = TranscriptionDisplay.Text;
+
                 ErrorText.Text = display.GetError();
                 await Task.Delay(100);
             }
         }
 
-        private async void StopButton_Click(object sender, RoutedEventArgs e)
+        private void StopButton_Click(object sender, RoutedEventArgs e)
         {
+            StopListening();
+        }
+
+        private async void StopListening()
+        {
+            MicListening.Text = "";
+            AudioListening.Text = "";
             await service.StopAudioRecognizer();
             await service.StopMicrophoneRecognizer();
             stillWorking = false;
             StartMicButton.IsEnabled = true;
             StartDeskButton.IsEnabled = true;
-            MicListening.Text = "";
-            AudioListening.Text = "";
         }
 
         private async void StartMicButton_Click(object sender, RoutedEventArgs e)
         {
             StartMicButton.IsEnabled = false;
             stillWorking = true;
+            MicListening.Text = "Mic Listening";
             await service.StartMicrophoneRecognizer();
             await TranscribeLoop();
-            MicListening.Text = "Mic Listening";
         }
 
         private async void StartDeskButton_Click(object sender, RoutedEventArgs e)
         {
             StartDeskButton.IsEnabled = false;
             stillWorking = true;
+            AudioListening.Text = "Audio Listening";
             await service.StartAudioRecognizer(selectedDevice);
             await TranscribeLoop();
-            AudioListening.Text = "Audio Listening";
         }
 
         private void MenuItemSetKey_Click(object sender, RoutedEventArgs e)
@@ -276,6 +302,11 @@ namespace Transcribe
             RTMicTranscriptionDisplay.Text = display.GetRealtimeMic();
             RTAudioTranscriptionDisplay.Text = display.GetRealtimeAudio();
             TranscriptionDisplay.Text = display.GetTranscription();
+        }
+
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

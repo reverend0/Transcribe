@@ -12,7 +12,7 @@ namespace Transcribe
         public static byte[] ToPCM16(byte[] inputBuffer, int length, WaveFormat format)
         {
             if (length == 0)
-                return new byte[0]; // No bytes recorded, return empty array.
+                return System.Array.Empty<byte>(); // No bytes recorded, return empty array.
 
             // Create a WaveStream from the input buffer.
             using var memStream = new MemoryStream(inputBuffer, 0, length);

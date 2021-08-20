@@ -1,9 +1,14 @@
 ﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Transcribe.AudioService
@@ -20,17 +25,37 @@ namespace Transcribe.AudioService
         private readonly string _region;
         private readonly string _awsAccessKey;
         private readonly string _awsSecretKey;
+        private readonly DisplayHelper Display;
 
-        public AWSService(string AWSAccessKey, string AWSSecretKey, string AWSRegion)
+        private WasapiLoopbackCapture loopbackCapture;
+        private ClientWebSocket audioWS;
+        private CancellationTokenSource audioCTS;
+
+        public AWSService(string AWSAccessKey, string AWSSecretKey, string AWSRegion, DisplayHelper displayHelper)
         {
             _region = AWSRegion;
             _awsAccessKey = AWSAccessKey;
             _awsSecretKey = AWSSecretKey;
+
+            Display = displayHelper;
         }
 
-        public Task StartAudioRecognizer(MMDevice selectedDevice)
+        public async Task StartAudioRecognizer(MMDevice selectedDevice)
         {
-            throw new NotImplementedException();
+            audioWS = new ClientWebSocket();
+            audioCTS = new CancellationTokenSource();
+            await audioWS.ConnectAsync(new Uri(GenerateUrl()), audioCTS.Token);
+
+            loopbackCapture = new WasapiLoopbackCapture(selectedDevice);
+            loopbackCapture.DataAvailable += (s, a) =>
+            {
+                byte[] buffer = AudioUtility.ToPCM16(a.Buffer, a.BytesRecorded, loopbackCapture.WaveFormat);
+                string json = "headers: {" +
+                              "':message-type': {type: 'string', value: 'event'}," +
+                              "':event-type': {type: 'string', value: 'AudioEvent'}" +
+                              "}, body: " + buffer;
+                audioWS.SendAsync(JsonSerializer.SerializeToUtf8Bytes(json), WebSocketMessageType.Binary, false, audioCTS.Token);
+            };
         }
 
         public Task StartMicrophoneRecognizer()
@@ -38,14 +63,61 @@ namespace Transcribe.AudioService
             throw new NotImplementedException();
         }
 
-        public Task StopAudioRecognizer()
+        public async Task StopAudioRecognizer()
         {
-            throw new NotImplementedException();
+            if (loopbackCapture != null)
+            {
+                if (audioWS.State == WebSocketState.Open)
+                {
+                    audioCTS.CancelAfter(1000);
+                    await audioWS.CloseOutputAsync(WebSocketCloseStatus.Empty, "", CancellationToken.None);
+                    await audioWS.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                }
+                audioWS.Dispose();
+                audioWS = null;
+                audioCTS.Dispose();
+                audioCTS = null;
+                loopbackCapture.StopRecording();
+                loopbackCapture.Dispose();
+            }
         }
 
         public Task StopMicrophoneRecognizer()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task ReadResponse()
+        {
+            byte[] buffer = new byte[1024];
+            MemoryStream result = new();
+            WebSocketReceiveResult receiveResult;
+            do
+            {
+                receiveResult = await audioWS.ReceiveAsync(buffer, audioCTS.Token);
+                if (receiveResult.MessageType != WebSocketMessageType.Close)
+                {
+                    result.Write(buffer);
+                }
+            } while (!receiveResult.EndOfMessage);
+
+            StreamReader reader = new(result);
+            string value = reader.ReadToEnd();
+
+            Root resultObject = JsonSerializer.Deserialize<Root>(value);
+            if (!resultObject.Transcript.Results[0].IsPartial)
+            {
+                // Write this to the main history.
+                Display.PrependTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
+            }
+            else
+            {
+                // Write this to real-time.
+                Display.SetRealtimeAudioTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
+            }
+
+            result.Dispose();
+            reader.Dispose();
         }
 
         private string GenerateUrl()
@@ -140,5 +212,43 @@ namespace Transcribe.AudioService
         {
             return HashAlgorithm.Create("SHA-256").ComputeHash(Encoding.UTF8.GetBytes(data));
         }
+
+        // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+        public class Item
+        {
+            public double Confidence { get; set; }
+            public string Content { get; set; }
+            public double EndTime { get; set; }
+            public double StartTime { get; set; }
+            public string Type { get; set; }
+            public bool VocabularyFilterMatch { get; set; }
+        }
+
+        public class Alternative
+        {
+            public List<Item> Items { get; set; }
+            public string Transcript { get; set; }
+        }
+
+        public class Result
+        {
+            public List<Alternative> Alternatives { get; set; }
+            public double EndTime { get; set; }
+            public bool IsPartial { get; set; }
+            public string ResultId { get; set; }
+            public double StartTime { get; set; }
+        }
+
+        public class Transcript
+        {
+            public List<Result> Results { get; set; }
+        }
+
+        public class Root
+        {
+            public Transcript Transcript { get; set; }
+        }
+
+
     }
 }

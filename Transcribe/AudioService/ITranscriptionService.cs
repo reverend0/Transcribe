@@ -9,5 +9,6 @@ namespace Transcribe.AudioService
         public Task StopMicrophoneRecognizer();
         public Task StartAudioRecognizer(MMDevice selectedDevice);
         public Task StopAudioRecognizer();
+        public Task ReadResponse();
     }
 }

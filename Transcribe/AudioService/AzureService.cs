@@ -9,8 +9,8 @@ namespace Transcribe
 {
     class AzureService : ITranscriptionService
     {
-        private SpeechConfig speechConfig;
-        private DisplayHelper display;
+        private readonly SpeechConfig speechConfig;
+        private readonly DisplayHelper display;
 
         private SpeechRecognizer micRecognizer;
         private SpeechRecognizer audioRecognizer;
@@ -137,5 +137,9 @@ namespace Transcribe
             }
         }
 
+        public Task ReadResponse()
+        {
+            return null;
+        }
     }
 }
