@@ -1,4 +1,5 @@
-﻿using NAudio.CoreAudioApi;
+﻿using Force.Crc32;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -44,18 +45,25 @@ namespace Transcribe.AudioService
         {
             audioWS = new ClientWebSocket();
             audioCTS = new CancellationTokenSource();
+
             await audioWS.ConnectAsync(new Uri(GenerateUrl()), audioCTS.Token);
 
             loopbackCapture = new WasapiLoopbackCapture(selectedDevice);
             loopbackCapture.DataAvailable += (s, a) =>
             {
                 byte[] buffer = AudioUtility.ToPCM16(a.Buffer, a.BytesRecorded, loopbackCapture.WaveFormat);
-                string json = "headers: {" +
-                              "':message-type': {type: 'string', value: 'event'}," +
-                              "':event-type': {type: 'string', value: 'AudioEvent'}" +
-                              "}, body: " + buffer;
-                audioWS.SendAsync(JsonSerializer.SerializeToUtf8Bytes(json), WebSocketMessageType.Binary, false, audioCTS.Token);
+                //string bufferStr = Encoding.UTF8.GetString(buffer);
+                //string bufferStr = Convert.ToBase64String(buffer);
+                Dictionary<string, string> headers = new Dictionary<string, string>(2);
+                headers.Add(":message-type", "event");
+                headers.Add(":event-type", "AudioEvent");
+                byte[] payload = AWSEventStreamMarshaller.marshall(headers, buffer);
+                /*string json = "{headers: {':message-type': {type: 'string', value: 'event'}, ':event-type': {type: 'string', value: 'AudioEvent'}" +
+                              "}, body: " + bufferStr + "}";*/
+                Display.PrependTranscription(DateTime.Now + ": " + payload.Length);
+                audioWS.SendAsync(payload, WebSocketMessageType.Binary, false, audioCTS.Token);
             };
+            loopbackCapture.StartRecording();
         }
 
         public Task StartMicrophoneRecognizer()
@@ -67,7 +75,7 @@ namespace Transcribe.AudioService
         {
             if (loopbackCapture != null)
             {
-                if (audioWS.State == WebSocketState.Open)
+                if (audioWS != null && audioWS.State == WebSocketState.Open)
                 {
                     audioCTS.CancelAfter(1000);
                     await audioWS.CloseOutputAsync(WebSocketCloseStatus.Empty, "", CancellationToken.None);
@@ -91,29 +99,41 @@ namespace Transcribe.AudioService
         {
             byte[] buffer = new byte[1024];
             MemoryStream result = new();
-            WebSocketReceiveResult receiveResult;
+            WebSocketReceiveResult receiveResult = null;
             do
             {
-                receiveResult = await audioWS.ReceiveAsync(buffer, audioCTS.Token);
-                if (receiveResult.MessageType != WebSocketMessageType.Close)
+                try
+                {
+                    if (audioWS != null && audioCTS != null)
+                        receiveResult = await audioWS.ReceiveAsync(buffer, audioCTS.Token);
+                }
+                catch (WebSocketException ex)
+                {
+                    Display.DisplayError(ex.Message);
+                    break;
+                }
+                if (receiveResult != null && receiveResult.MessageType != WebSocketMessageType.Close)
                 {
                     result.Write(buffer);
                 }
-            } while (!receiveResult.EndOfMessage);
+            } while (audioWS != null && !receiveResult.EndOfMessage);
 
             StreamReader reader = new(result);
             string value = reader.ReadToEnd();
 
-            Root resultObject = JsonSerializer.Deserialize<Root>(value);
-            if (!resultObject.Transcript.Results[0].IsPartial)
+            if (value != null && !value.Equals(""))
             {
-                // Write this to the main history.
-                Display.PrependTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
-            }
-            else
-            {
-                // Write this to real-time.
-                Display.SetRealtimeAudioTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
+                Root resultObject = JsonSerializer.Deserialize<Root>(value);
+                if (!resultObject.Transcript.Results[0].IsPartial)
+                {
+                    // Write this to the main history.
+                    Display.PrependTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
+                }
+                else
+                {
+                    // Write this to real-time.
+                    Display.SetRealtimeAudioTranscription(resultObject.Transcript.Results[0].Alternatives[0].Transcript);
+                }
             }
 
             result.Dispose();
@@ -144,10 +164,11 @@ namespace Transcribe.AudioService
                 {"X-Amz-SignedHeaders", "host"},
                 {"language-code", "en-US"},
                 {"media-encoding", "pcm"},
-                {"sample-rate", "44100"}
+                {"sample-rate", "16000"}
             };
             return string.Join("&", result.Select(x => $"{x.Key}={Uri.EscapeDataString(x.Value)}"));
         }
+
 
         private string GetSignature(string host, string dateString, string dateTimeString, string credentialScope)
         {
@@ -248,7 +269,6 @@ namespace Transcribe.AudioService
         {
             public Transcript Transcript { get; set; }
         }
-
 
     }
 }

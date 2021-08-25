@@ -21,6 +21,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using Transcribe.AudioService;
 
 namespace Transcribe
 {
@@ -33,7 +34,7 @@ namespace Transcribe
 
         DisplayHelper display;
 
-        private AzureService service;
+        private ITranscriptionService service;
         RegistryManager manager = new RegistryManager();
 
         private MMDevice selectedDevice;
@@ -181,6 +182,7 @@ namespace Transcribe
             string oldRTmic = "", oldRTaudio = "", oldTranscription = "";
             while (stillWorking)
             {
+                await service.ReadResponse();
                 RTMicTranscriptionDisplay.Text = display.GetRealtimeMic();
                 RTAudioTranscriptionDisplay.Text = display.GetRealtimeAudio();
                 TranscriptionDisplay.Text = display.GetTranscription();
@@ -213,7 +215,7 @@ namespace Transcribe
             MicListening.Text = "";
             AudioListening.Text = "";
             await service.StopAudioRecognizer();
-            await service.StopMicrophoneRecognizer();
+            //await service.StopMicrophoneRecognizer();
             stillWorking = false;
             StartMicButton.IsEnabled = true;
             StartDeskButton.IsEnabled = true;
